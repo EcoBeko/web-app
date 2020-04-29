@@ -1,5 +1,8 @@
 <template>
-  <section class="news">
+  <section
+    class="news"
+    v-waypoint="{ active: true, callback: onWaypoint, options: intersectionOptions }"
+  >
     <news-header class="header"></news-header>
     <transition-group
       :css="false"
@@ -28,59 +31,30 @@ export default {
   name: "HomePageNews",
   components: {
     NewsHeader,
-    NewsItem
+    NewsItem,
   },
   data() {
     return {
-      posts: [
-        {
-          authorImage: "alina.png",
-          authorName: "Alina Danaeva",
-          authorStatus: "Follow",
-          time: new Date(),
-          image: "welcome.gif",
-          title: "Welcome To Eco Beko!",
-          text: `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto ipsa reprehenderit molestias quam magni. Dolore odio rerum itaque deleniti error corrupti voluptates laudantium nostrum incidunt, ipsa animi minus. Est, soluta, incidunt aperiam ullam odio minima repellat unde eveniet, dolores consequuntur quas iusto ducimus omnis provident? Tempora nemo asperiores ut qui.`,
-          likes: 340,
-          comments: 0,
-          reposts: 3
-        },
-        {
-          authorImage: "alina.png",
-          authorName: "Alina Danaeva",
-          authorStatus: "Follow",
-          time: new Date(Date.now() - 8640000),
-          image: "welcome.gif",
-          title: "Our goals",
-          text: `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto ipsa reprehenderit molestias quam magni. Dolore odio rerum itaque deleniti error corrupti voluptates laudantium nostrum incidunt, ipsa animi minus. Est, soluta, incidunt aperiam ullam odio minima repellat unde eveniet, dolores consequuntur quas iusto ducimus omnis provident? Tempora nemo asperiores ut qui.`,
-          likes: 140,
-          comments: 0,
-          reposts: 2
-        },
-        {
-          authorImage: "alina.png",
-          authorName: "Alina Danaeva",
-          authorStatus: "Follow",
-          time: new Date(Date.now() - 8640000 - 8640000),
-          image: "welcome.gif",
-          title: "What you can do",
-          text: `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto ipsa reprehenderit molestias quam magni. Dolore odio rerum itaque deleniti error corrupti voluptates laudantium nostrum incidunt, ipsa animi minus. Est, soluta, incidunt aperiam ullam odio minima repellat unde eveniet, dolores consequuntur quas iusto ducimus omnis provident? Tempora nemo asperiores ut qui.`,
-          likes: 543,
-          comments: 0,
-          reposts: 17
-        }
-      ]
+      intersectionOptions: {
+        root: null,
+        rootMargin: "0px 0px 0px 0px",
+        threshold: 0.95,
+      },
+      offset: 0,
     };
   },
   computed: {
+    posts() {
+      return this.$store.state.news.posts;
+    },
     filteredPosts() {
-      return this.posts.filter(item => {
+      return this.posts.filter((item) => {
         return item.title.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
       });
     },
     query() {
       return this.$store.state.news.search;
-    }
+    },
   },
   methods: {
     beforeEnter(el) {
@@ -98,8 +72,16 @@ export default {
       setTimeout(() => {
         Velocity(el, { opacity: 0, transform: "scale(0)" }, { complete: done });
       }, delay);
-    }
-  }
+    },
+    async onWaypoint({ going, direction }) {
+      console.log(going, direction);
+      const before = this.posts.length;
+      await this.$store.dispatch("fetchPosts", this.offset);
+      const after = this.posts.length;
+      if (before != after)
+        this.offset += 3;
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

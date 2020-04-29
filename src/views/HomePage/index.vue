@@ -17,11 +17,8 @@ import HomePageSuggestions from "./HomePageSuggestions";
 
 export default {
   name: "HomePage",
-  created() {
-    if (!this.$store.getters.getToken) {
-      this.$router.push("/welcome");
-    }
-
+  async created() {
+    await this.$parent.checkToken();
     document.title = "Eco Beko | Home";
   },
   components: {

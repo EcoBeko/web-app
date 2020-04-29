@@ -66,4 +66,15 @@ export default {
       }
     },
   },
+  posts: {
+    async fetchPortion(token, offset) {
+      try {
+        return await api.get("/posts/fetch-portion/" + offset, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch (err) {
+        return err.response;
+      }
+    },
+  },
 };

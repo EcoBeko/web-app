@@ -8,6 +8,10 @@ export default new Vuex.Store({
   state: {
     token: null,
     user: null,
+    news: {
+      search: "",
+      posts: [],
+    },
   },
   mutations: {
     setToken(state, payload) {
@@ -16,6 +20,15 @@ export default new Vuex.Store({
     },
     setUser(state, payload) {
       state.user = payload;
+    },
+    newQuery(state, payload) {
+      state.news.search = payload;
+    },
+    morePosts(state, posts) {
+      for (const post of posts) {
+        if (!state.news.posts.filter((item) => item.id == post.id).length)
+          state.news.posts.push(post);
+      }
     },
   },
   getters: {
@@ -63,6 +76,16 @@ export default new Vuex.Store({
       const response = await api.users.register(payload);
 
       return response.data;
-    }
+    },
+    async fetchPosts({ commit, getters }, offset) {
+      const localToken = getters.getToken;
+      const response = await api.posts.fetchPortion(localToken, offset);
+
+      if (response.data.status) {
+        commit("morePosts", response.data.posts);
+      }
+
+      return response.data;
+    },
   },
 });

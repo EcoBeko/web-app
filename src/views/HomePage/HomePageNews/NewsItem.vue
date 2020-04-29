@@ -1,20 +1,19 @@
 <template>
-  <article class="news-item" @click="$refs.box.alert('Sorry, still in development')">
+  <article class="news-item">
     <alert-box :time="1500" ref="box"></alert-box>
-    <img :src="getImage(post.authorImage)" alt="author-image" class="author-image" />
+    <img :src="loadImage(post.owner.avatar)" alt="author-image" class="author-image" />
     <div class="content">
       <header class="heading">
         <div class="author-wrapper">
-          <span class="author">{{ post.authorName }}</span>
+          <span class="author">{{ fullName }}</span>
           <span>shared</span>
         </div>
         <div class="status-wrapper">
-          <span>{{ post.authorStatus }}</span>
           <span class="time">{{ fixedTime }}</span>
         </div>
       </header>
       <div class="post-image">
-        <img :src="getImage(post.image)" alt="post-image" />
+        <img :src="loadImage(post.image)" alt="post-image" />
       </div>
       <h3 class="post-title">
         {{ post.title }}
@@ -27,12 +26,6 @@
         <icon-text image="like.svg" size="16px">
           {{ post.likes }}
         </icon-text>
-        <icon-text image="comment.svg" size="16px">
-          {{ post.comments }}
-        </icon-text>
-        <icon-text image="repost.svg" size="16px">
-          {{ post.reposts }}
-        </icon-text>
       </div>
     </div>
   </article>
@@ -42,23 +35,30 @@
 export default {
   name: "NewsItem",
   props: {
-    post: Object
+    post: Object,
   },
   methods: {
     getImage(image) {
       const images = require.context("@/assets/", false, /[\.png\.gif]$/);
       return images("./" + image);
-    }
+    },
+    loadImage(image) {
+      return `http://localhost:3000/${image}`;
+    },
   },
   computed: {
     fixedTime() {
-      return this.post.time.toLocaleString();
+      const date = Date.parse(this.post.time);
+      return date.toLocaleString();
     },
     fixedText() {
-      if (this.post.text.length > 200) return this.post.text.substr(0, 200) + "...";
-      return this.post.text;
-    }
-  }
+      if (this.post.article.length > 200) return this.post.article.substr(0, 200) + "...";
+      return this.post.article;
+    },
+    fullName() {
+      return this.post.owner.surname + " " + this.post.owner.name;
+    },
+  },
 };
 </script>
 
