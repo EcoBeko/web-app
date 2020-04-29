@@ -86,5 +86,34 @@ export default {
         return err.response;
       }
     },
+    async write(title, text, image, token) {
+      try {
+        const form = new FormData();
+        form.append("test", image);
+
+        const fileName = (
+          await api.post("/test/upload", form, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+        ).data.fileName;
+
+
+        return await api.post(
+          "/posts/write",
+          {
+            title,
+            article: text,
+            image: fileName,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      } catch (err) {
+        return err.response;
+      }
+    },
   },
 };
