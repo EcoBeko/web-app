@@ -59,5 +59,10 @@ export default new Vuex.Store({
 
       return response.data;
     },
+    async registerUser({ commit }, payload) {
+      const response = await api.users.register(payload);
+
+      return response.data;
+    }
   },
 });
