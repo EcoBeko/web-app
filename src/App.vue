@@ -12,7 +12,6 @@ export default {
   data() {
     return {
       slideName: "slide-left",
-      tokenIntervalId: 0,
     };
   },
   watch: {
@@ -21,15 +20,6 @@ export default {
       const fromDepth = from.path.split("/").length;
       this.slideName = toDepth < fromDepth ? "slide-right" : "slide-left";
     },
-  },
-  async created() {
-    console.clear();
-    this.tokenIntervalId = setInterval(async () => {
-      await this.checkToken();
-    }, 3000);
-  },
-  beforeDestroy() {
-    clearInterval(this.tokenIntervalId);
   },
   methods: {
     async checkToken() {

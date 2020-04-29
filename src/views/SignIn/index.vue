@@ -29,14 +29,12 @@
 </template>
 
 <script>
-import api from "../../api";
+import api from "@/api";
 
 export default {
   name: "SignIn",
-  created() {
-    if (this.$store.getters.getToken) {
-      this.$router.push("/");
-    }
+  async created() {
+    await this.$parent.checkToken();
     document.title = "EcoBeko | Sign In";
   },
   components: {},
@@ -46,12 +44,10 @@ export default {
         password: {
           value: "",
           error: false,
-          pattern: /(?=.{8,})/i,
         },
         phone: {
-          value: "+7",
+          value: "",
           error: false,
-          pattern: /^(\+7)([0-9]+){10}/i,
         },
       },
     };
@@ -59,21 +55,24 @@ export default {
   methods: {
     async signIn() {
       const { phone, password } = this.form;
-      phone.error = !phone.pattern.test(phone.value);
-      password.error = !password.pattern.test(password.value);
+      phone.value = phone.value.replace(/^(\+7|8)/, "");
+
+      if (phone.value && password.value) {
+        phone.error = !(await api.users.validate("phone", phone.value));
+        password.error = !(await api.users.validate("password", password.value));
+      } else return this.$refs.box.alert("Please, enter the data");
 
       if (!phone.error && !password.error) {
-        const response = await api.validate(phone.value, password.value);
-        
-        if (response.data.err) {
-          this.$refs.box.alert(response.data.err || response.data);
-        } else if (response.data.phone === phone.value.substr(1)) {
-          this.$store.commit("setToken", response.data);
+        const responseData = await this.$store.dispatch("authenticate", {
+          phone: phone.value,
+          password: password.value,
+        });
 
-          if (response.data.name === "admin") {
-            return this.$router.push("/admin-panel");
-          }
-          return this.$router.push("/");
+        if (!responseData.status) this.$refs.box.alert(responseData.message);
+        else {
+          await this.$store.dispatch("fetchUser");
+          const route = this.$store.getters.getModuleRoute;
+          this.$router.push(route);
         }
       }
     },

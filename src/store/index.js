@@ -12,7 +12,7 @@ export default new Vuex.Store({
   mutations: {
     setToken(state, payload) {
       state.token = payload;
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", state.token);
     },
     setUser(state, payload) {
       state.user = payload;
@@ -24,7 +24,7 @@ export default new Vuex.Store({
       return token;
     },
     getModuleRoute({ user }) {
-      if (!user) {
+      if (user) {
         const name = user.modules.name;
         if (name === "user") return "/";
         if (name === "admin") return "/admin-panel";
@@ -38,14 +38,26 @@ export default new Vuex.Store({
       const localToken = getters.getToken;
       if (!localToken) return false;
 
-      const result = await api.token.validate(localToken);
-      return result.data.status;
+      const response = await api.token.validate(localToken);
+      return response.data.status;
     },
     async fetchUser({ commit, getters }) {
       const localToken = getters.getToken;
       const response = await api.users.fetchData(localToken);
 
-      if (response.status == 200) commit("setUser", response.data.user);
+      if (response.data.status) {
+        commit("setUser", response.data.user);
+      }
+      return response.data;
+    },
+    async authenticate({ commit }, payload) {
+      const response = await api.users.authenticate(payload.phone, payload.password);
+
+      if (response.data.status) {
+        commit("setToken", response.data.token);
+      }
+
+      return response.data;
     },
   },
 });
