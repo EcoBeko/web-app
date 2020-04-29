@@ -51,5 +51,30 @@ export default {
         return err.response;
       }
     },
+    async register({ name, surname, password, gender, phone, birthday }) {
+      try {
+        return await api.post("/users/register-user", {
+          name,
+          surname,
+          password,
+          gender,
+          phone,
+          birthday,
+        });
+      } catch (err) {
+        return err.response;
+      }
+    },
+  },
+  posts: {
+    async fetchPortion(token, offset) {
+      try {
+        return await api.get("/posts/fetch-portion/" + offset, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch (err) {
+        return err.response;
+      }
+    },
   },
 };

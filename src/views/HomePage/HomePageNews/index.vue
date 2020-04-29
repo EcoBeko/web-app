@@ -1,5 +1,9 @@
 <template>
-  <section class="news">
+  <section
+    class="news"
+    v-waypoint="{ active: true, callback: onWaypoint, options: intersectionOptions }"
+  >
+    <news-article class="article" v-if="reading" :article="selectedArticle"></news-article>
     <news-header class="header"></news-header>
     <transition-group
       :css="false"
@@ -8,6 +12,7 @@
       @leave="leave"
       name="staggered-fade"
       class="item-wrapper"
+      v-if="!reading"
     >
       <news-item
         v-for="(post, index) in filteredPosts"
@@ -15,6 +20,7 @@
         :post="post"
         class="item"
         :data-index="index"
+        @select-article="selecteArticle"
       ></news-item>
     </transition-group>
   </section>
@@ -23,66 +29,50 @@
 <script>
 import NewsHeader from "./NewsHeader";
 import NewsItem from "./NewsItem";
+import NewsArticle from "./NewsArticle";
 
 export default {
   name: "HomePageNews",
   components: {
     NewsHeader,
-    NewsItem
+    NewsItem,
+    NewsArticle,
   },
   data() {
     return {
-      posts: [
-        {
-          authorImage: "alina.png",
-          authorName: "Alina Danaeva",
-          authorStatus: "Follow",
-          time: new Date(),
-          image: "welcome.gif",
-          title: "Welcome To Eco Beko!",
-          text: `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto ipsa reprehenderit molestias quam magni. Dolore odio rerum itaque deleniti error corrupti voluptates laudantium nostrum incidunt, ipsa animi minus. Est, soluta, incidunt aperiam ullam odio minima repellat unde eveniet, dolores consequuntur quas iusto ducimus omnis provident? Tempora nemo asperiores ut qui.`,
-          likes: 340,
-          comments: 0,
-          reposts: 3
-        },
-        {
-          authorImage: "alina.png",
-          authorName: "Alina Danaeva",
-          authorStatus: "Follow",
-          time: new Date(Date.now() - 8640000),
-          image: "welcome.gif",
-          title: "Our goals",
-          text: `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto ipsa reprehenderit molestias quam magni. Dolore odio rerum itaque deleniti error corrupti voluptates laudantium nostrum incidunt, ipsa animi minus. Est, soluta, incidunt aperiam ullam odio minima repellat unde eveniet, dolores consequuntur quas iusto ducimus omnis provident? Tempora nemo asperiores ut qui.`,
-          likes: 140,
-          comments: 0,
-          reposts: 2
-        },
-        {
-          authorImage: "alina.png",
-          authorName: "Alina Danaeva",
-          authorStatus: "Follow",
-          time: new Date(Date.now() - 8640000 - 8640000),
-          image: "welcome.gif",
-          title: "What you can do",
-          text: `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto ipsa reprehenderit molestias quam magni. Dolore odio rerum itaque deleniti error corrupti voluptates laudantium nostrum incidunt, ipsa animi minus. Est, soluta, incidunt aperiam ullam odio minima repellat unde eveniet, dolores consequuntur quas iusto ducimus omnis provident? Tempora nemo asperiores ut qui.`,
-          likes: 543,
-          comments: 0,
-          reposts: 17
-        }
-      ]
+      intersectionOptions: {
+        root: null,
+        rootMargin: "0px 0px 0px 0px",
+        threshold: 0.99,
+      },
+      offset: 0,
+      started: false,
+      selectedArticle: {},
     };
   },
   computed: {
+    reading() {
+      return this.$store.state.news.reading;
+    },
+    posts() {
+      return this.$store.state.news.posts;
+    },
     filteredPosts() {
-      return this.posts.filter(item => {
+      if (this.reading) return [];
+
+      return this.posts.filter((item) => {
         return item.title.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
       });
     },
     query() {
       return this.$store.state.news.search;
-    }
+    },
   },
   methods: {
+    selecteArticle(id) {
+      this.selectedArticle = this.posts.filter((post) => post.id == id)[0];
+      this.$store.state.news.reading = true;
+    },
     beforeEnter(el) {
       el.style.opacity = 0;
       el.style.transform = "scale(0)";
@@ -98,12 +88,31 @@ export default {
       setTimeout(() => {
         Velocity(el, { opacity: 0, transform: "scale(0)" }, { complete: done });
       }, delay);
-    }
-  }
+    },
+    async onWaypoint({ going, direction }) {
+      if (!this.started && !this.reading) {
+        this.started = true;
+        const before = this.posts.length;
+        await this.$store.dispatch("fetchPosts", this.offset);
+        const after = this.posts.length;
+        if (before != after) this.offset += after - before;
+        this.started = false;
+      }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
+.article {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .news {
+  position: relative;
   height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

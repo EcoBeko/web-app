@@ -14,7 +14,7 @@
 export default {
   model: {
     event: "change",
-    prop: "checked"
+    prop: "checked",
   },
   name: "BaseRadio",
   data() {
@@ -22,14 +22,14 @@ export default {
   },
   props: {
     label: String,
-    val: String,
+    val: [String, Number],
     group: String,
     error: Boolean,
     "error-text": {
       type: String,
-      default: "Check it"
-    }
-  }
+      default: "Check it",
+    },
+  },
 };
 </script>
 
@@ -84,5 +84,4 @@ label {
   position: absolute;
   right: -100px;
 }
-
 </style>

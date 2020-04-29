@@ -1,5 +1,5 @@
 <template>
-  <header class="header" @click="$refs.box.alert(`Sorry, that's wont't work for now`)">
+  <header class="header" v-if="!reading">
     <alert-box :time="2000" ref="box"></alert-box>
     <icon-text image="share.svg" size="22px" class="item border-right">
       Share an update
@@ -17,7 +17,11 @@
 export default {
   name: "NewsHeader",
   components: {},
-  computed: {}
+  computed: {
+    reading() {
+      return this.$store.state.news.reading;
+    }
+  }
 };
 </script>
 

@@ -27,10 +27,10 @@
       ></base-input>
       <div class="gender-wrapper">
         <span>Gender:</span>
-        <base-radio label="Male" val="male" group="gender" v-model="form.gender.value"></base-radio>
+        <base-radio label="Male" :val="1" group="gender" v-model="form.gender.value"></base-radio>
         <base-radio
           label="Female"
-          val="female"
+          :val="0"
           group="gender"
           v-model="form.gender.value"
           :error="form.gender.error"
@@ -79,62 +79,58 @@ Terms of Use and Privacy Policy."
 </template>
 
 <script>
-import api from "../../api";
+import api from "@/api";
 
 export default {
   name: "SignUp",
-  created() {
-    if (this.$store.getters.getToken) {
-      this.$router.push("/");
-    }
+  async created() {
+    await this.$parent.checkToken();
     document.title = "EcoBeko | Sign Up";
   },
   components: {},
   methods: {
     async signUp() {
       const { name, surname, phone, password, confPassword, gender, birthday, policy } = this.form;
-      this.test(name, surname, phone, password);
-      confPassword.error = confPassword.value !== password.value;
-      gender.error = gender.value === "";
-      policy.error = policy.value === "";
-      birthday.error = birthday.value === "";
-      if (
-        !name.error &&
-        !surname.error &&
-        !phone.error &&
-        !password.error &&
-        !confPassword.error &&
-        !gender.error &&
-        !birthday.error &&
-        !policy.error
-      ) {
-        const response = await api.register(
-          phone.value,
-          name.value,
-          surname.value,
-          gender.value,
-          password.value,
-          birthday.value
-        );
 
-        if (response.data.err) {
-          this.$refs.box.alert(response.data.err);
-        } else {
-          // the most hardcoded piece of doom, that I have ever done (sorry future me)
-          const user = (await api.validate(phone.value, password.value)).data;
-          if (user?.phone === phone.value.substr(1)) {
-            this.$store.commit("setToken", user);
-            this.$router.push("/");
-          } else {
-            this.$refs.box.alert("Sorry, something went wrong on the server");
-          }
-        }
-      }
+      // validating data
+      phone.value = phone.value.replace(/^(\+7|8)/, "");
+      const fields = await this.test(name, surname, phone, password, gender, birthday);
+      confPassword.error = password.value != confPassword.value;
+      policy.error = policy.value == "";
+
+      if (!fields) return this.$refs.box.alert("Please, fill out everything");
+
+      // if some error occured
+      if (this.isFalse(name, surname, phone, password, confPassword, gender, birthday, policy))
+        return this.$refs.box.alert("Please, fill out everything");
+
+      // try to register
+      const responseData = await this.$store.dispatch("registerUser", {
+        name: name.value,
+        surname: surname.value,
+        phone: phone.value,
+        password: password.value,
+        gender: gender.value,
+        birthday: birthday.value,
+      });
+
+      if (!responseData.status) return this.$refs.box.alert(responseData.message);
+
+      this.$refs.box.alert("Good, now try to sign in", false);
+      setTimeout(() => this.$router.push("/welcome/sign-in"), 1500);
     },
-    test(...items) {
+    async test(...items) {
       for (const item of items) {
-        item.error = !item.pattern.test(item.value);
+        if (item.value !== "") item.error = !(await api.users.validate(item.name, item.value));
+        else return false;
       }
+      return true;
+    },
+    isFalse(...items) {
+      for (const item of items) {
+        if (item.error) return true;
+      }
+      return false;
     },
   },
   data() {
@@ -143,30 +139,32 @@ export default {
         name: {
           value: "",
           error: false,
-          pattern: /[a-z-]+/i,
+          name: "name",
         },
         surname: {
           value: "",
           error: false,
-          pattern: /[a-z-]/i,
+          name: "surname",
         },
         phone: {
           value: "+7",
           error: false,
-          pattern: /^(\+7)([0-9]+){10}/i,
+          name: "phone",
         },
         gender: {
           value: "",
           error: false,
+          name: "gender",
         },
         birthday: {
           value: "",
           error: false,
+          name: "birthday",
         },
         password: {
           value: "",
           error: false,
-          pattern: /(?=.{8,})/i,
+          name: "password",
         },
         confPassword: {
           value: "",
