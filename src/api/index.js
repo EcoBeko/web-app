@@ -84,6 +84,17 @@ export default {
         }
       },
     },
+    friends: {
+      async recommendations(token) {
+        try {
+          return await api.get("users/friends/recommendations", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        } catch (err) {
+          return err.response;
+        }
+      },
+    },
   },
   posts: {
     async fetchPortion(token, offset) {

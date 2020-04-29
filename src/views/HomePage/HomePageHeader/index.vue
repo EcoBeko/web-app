@@ -12,12 +12,6 @@
         <span v-if="user">{{ user.name }} {{ user.surname }}</span>
         <span v-else>User</span>
       </div>
-      <img
-        src="@/assets/notification.svg"
-        alt="notification"
-        class="notification"
-        @click="alertTopBox"
-      />
       <img src="@/assets/gear.svg" alt="configs" class="configs" @click="alertTopBox" />
     </div>
     <nav class="nav">
@@ -49,49 +43,50 @@ import HeaderSearch from "./HeaderSearch";
 export default {
   name: "HomePageHeader",
   components: {
-    HeaderSearch
+    HeaderSearch,
   },
   computed: {
     user() {
-      return this.$store.state.token;
-    }
+      if (this.$store.state.user) return this.$store.state.user;
+      return {};
+    },
   },
   data() {
     return {
       navItems: [
         {
           name: "News",
-          image: "news.svg"
+          image: "news.svg",
         },
         {
           name: "Profile",
-          image: "profile.svg"
+          image: "profile.svg",
         },
         {
           name: "Messages",
-          image: "notification.svg"
+          image: "notification.svg",
         },
         {
           name: "Friends",
-          image: "friend.svg"
+          image: "friend.svg",
         },
         {
           name: "Communities",
-          image: "comment.svg"
+          image: "comment.svg",
         },
         {
           name: "Map",
-          image: "pin.svg"
+          image: "pin.svg",
         },
         {
           name: "Eco Projects",
-          image: "gear.svg"
+          image: "gear.svg",
         },
         {
           name: "Logout",
-          image: "repost.svg"
-        }
-      ]
+          image: "repost.svg",
+        },
+      ],
     };
   },
   methods: {
@@ -109,8 +104,8 @@ export default {
     getImage(image) {
       const images = require.context("@/assets/", false, /[\.png\.svg]$/);
       return images("./" + image);
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="sug-item">
-    <img :src="getImage(image)" :alt="fullname" />
+    <img :src="image" :alt="fullname" />
     <span>{{ fullname }}</span>
   </div>
 </template>
@@ -28,6 +28,11 @@ export default {
   flex-direction: row;
   align-items: center;
   width: 80%;
+
+
+  img {
+    width: 42px;
+  }
 
   span {
     margin: 1em;

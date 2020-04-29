@@ -70,7 +70,7 @@ export default {
         this.$store.commit("addStats", {
           trees,
           energy,
-          waste: wastes,
+          wastes,
         });
       }, 1000);
     },
