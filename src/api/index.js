@@ -76,5 +76,15 @@ export default {
         return err.response;
       }
     },
+    async updateLikes(post, like) {
+      try {
+        return await api.post("/posts/like", {
+          id: post,
+          like,
+        });
+      } catch (err) {
+        return err.response;
+      }
+    },
   },
 };

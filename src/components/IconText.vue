@@ -1,5 +1,5 @@
 <template>
-  <div class="icon-text">
+  <div class="icon-text" @click="$emit('click')">
     <img :style="{ width: size }" class="image" :src="getImage(image)" :alt="image" />
     <span class="text"> <slot /> </span>
   </div>

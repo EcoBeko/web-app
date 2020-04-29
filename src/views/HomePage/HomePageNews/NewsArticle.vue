@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="post-items-wrapper">
-        <icon-text image="like.svg" size="16px">
+        <icon-text image="like.svg" size="16px" @click="like">
           {{ article.likes }}
         </icon-text>
       </div>
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import api from "@/api";
+
 export default {
   name: "NewsArticle",
   props: {
@@ -49,10 +51,10 @@ export default {
       return `http://localhost:3000/${image}`;
     },
     like() {
-      if (!this.liked) {
-        this.article.likes++;
-        this.liked = true;
-      }
+      if (!this.liked) this.article.likes++;
+      else this.article.likes--;
+
+      this.liked = !this.liked;
     },
     close() {
       this.$store.state.news.reading = false;
@@ -134,7 +136,7 @@ export default {
     border-radius: 10px;
     display: grid;
     grid-template-columns: 1fr 2fr;
-    grid-template-rows: 0.1fr 0.2fr 0.5fr 0.1fr;
+    grid-template-rows: 0.1fr 0.5fr 0.1fr;
     gap: 20px;
 
     .heading {
