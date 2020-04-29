@@ -11,6 +11,18 @@ const router = new VueRouter({
       path: "/",
       component: () => import("@/views/HomePage/index"),
       meta: { needToken: true, toAction: false },
+      children: [
+        {
+          path: "add",
+          component: () => import("@/views/HomePage/HomePageStats/AddTab"),
+          meta: { needToken: true, toAction: false },
+        },
+        {
+          path: "how",
+          component: () => import("@/views/HomePage/HomePageStats/HowStats"),
+          meta: { needToken: true, toAction: false },
+        },
+      ],
     },
     {
       path: "/welcome",

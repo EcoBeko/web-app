@@ -65,6 +65,25 @@ export default {
         return err.response;
       }
     },
+    stats: {
+      async add(token, trees, energy, waste) {
+        try {
+          return await api.put(
+            "/users/stats/add",
+            {
+              trees,
+              energy,
+              waste,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+        } catch (err) {
+          return err.response;
+        }
+      },
+    },
   },
   posts: {
     async fetchPortion(token, offset) {
@@ -99,7 +118,6 @@ export default {
           })
         ).data.fileName;
 
-
         return await api.post(
           "/posts/write",
           {
@@ -111,6 +129,15 @@ export default {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+      } catch (err) {
+        return err.response;
+      }
+    },
+  },
+  wastes: {
+    async fetch() {
+      try {
+        return await api.get("points/wastes/fetch");
       } catch (err) {
         return err.response;
       }

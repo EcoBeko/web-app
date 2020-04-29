@@ -2,77 +2,70 @@
   <section class="stats">
     <alert-box :time="2000" ref="box"></alert-box>
     <h2 class="title">Recycling Statistics</h2>
+    <div class="overlay" v-if="isOpen" @click="isOpen = false"></div>
+    <keep-alive>
+      <add-stats v-if="isOpen" @close-window="isOpen = false"></add-stats>
+    </keep-alive>
     <stat-item
       image="tree.svg"
       text="Saved Trees"
-      :data="stats[0].initial"
+      :data="stats ? stats.trees : 0"
       class="stat-item"
     ></stat-item>
     <stat-item
       image="power.svg"
       text="Energy Saved (kWH)"
-      :data="stats[1].initial"
+      :data="stats ? stats.energy : 0"
       class="stat-item"
     ></stat-item>
     <stat-item
       image="recy.svg"
       text="Recycled Waste (kg)"
-      :data="stats[2].initial"
+      :data="stats ? stats.waste : 0"
       class="stat-item"
     ></stat-item>
-    <button class="button" @click="$refs.box.alert('Sorry, still in development')">Join</button>
+    <button class="button" @click="isOpen = true">Add</button>
   </section>
 </template>
 
 <script>
 import StatItem from "./StatItem";
-
-function genFixed() {
-  return +(Math.random() * 10).toFixed(2);
-}
+import AddStats from "./AddStats";
 
 export default {
   name: "HomePageStats",
   components: {
-    StatItem
+    StatItem,
+    AddStats,
   },
   data() {
     return {
-      stats: [
-        {
-          initial: 0.0,
-          interval: 0
-        },
-        {
-          initial: 0.0,
-          interval: 0
-        },
-        {
-          initial: 0.0,
-          interval: 0
-        }
-      ]
+      isOpen: true,
     };
   },
-  created() {
-    for (const stat of this.stats) {
-      stat.interval = Math.round(genFixed()) * 1000;
-      stat.initial = genFixed();
-
-      stat.id = setInterval(() => {
-        stat.initial += genFixed();
-      }, stat.interval);
-    }
+  created() {},
+  computed: {
+    stats() {
+      if (this.$store.state.user) return this.$store.state.user.stats;
+      return null;
+    },
   },
-  beforeDestroy() {
-    for (const stat of this.stats) clearInterval(stat.id);
-  }
 };
 </script>
 
 <style lang="scss" scoped>
 @import "../../../scss/_globals.scss";
 @import "../../../scss/_base.scss";
+
+.overlay {
+  position: fixed;
+  background-color: rgba($color: #000000, $alpha: 0.3);
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
 
 .stats {
   background-color: white;

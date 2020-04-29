@@ -7765,6 +7765,13 @@ vue-loader@^15.8.3:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
+vue-material-checkbox@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/vue-material-checkbox/-/vue-material-checkbox-2.2.0.tgz#3cb06268e3e87fd8a3936c3a914b18106f04d88d"
+  integrity sha512-NZxu7dPWWyjL4fKYRffg5SVVMC/8d2PgjjixZxCfKkaQ/UqGzYlw0NxGfAJCUbiEsGjwpUO1KJ+S64UABauBqQ==
+  dependencies:
+    vue "^2.6.10"
+
 vue-router@^3.1.5:
   version "3.1.6"
   resolved "https://registry.npm.taobao.org/vue-router/download/vue-router-3.1.6.tgz?cache=0&sync_timestamp=1584203224109&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue-router%2Fdownload%2Fvue-router-3.1.6.tgz#45f5a3a3843e31702c061dd829393554e4328f89"
@@ -7798,7 +7805,7 @@ vue-waypoint@^3.4.1:
   dependencies:
     vue "^2.5.2"
 
-vue@^2.5.2, vue@^2.6.11:
+vue@^2.5.2, vue@^2.6.10, vue@^2.6.11:
   version "2.6.11"
   resolved "https://registry.npm.taobao.org/vue/download/vue-2.6.11.tgz?cache=0&sync_timestamp=1584399755108&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue%2Fdownload%2Fvue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
   integrity sha1-dllNh31LEiNEBuhONSdcbVFBJcU=

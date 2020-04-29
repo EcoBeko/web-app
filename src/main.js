@@ -8,6 +8,7 @@ import AlertBox from "./components/AlertBox.vue";
 import BaseInput from "./components/BaseInput.vue";
 import BaseRadio from "./components/BaseRadio.vue";
 import IconText from "./components/IconText.vue";
+import checkbox from "vue-material-checkbox";
 
 Vue.config.productionTip = false;
 
@@ -17,6 +18,7 @@ Vue.component("base-radio", BaseRadio);
 Vue.component("icon-text", IconText);
 
 Vue.use(VueWaypoint);
+Vue.use(checkbox);
 
 new Vue({
   router,

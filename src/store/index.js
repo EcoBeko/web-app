@@ -31,6 +31,11 @@ export default new Vuex.Store({
           state.news.posts.push(post);
       }
     },
+    addStats(state, payload) {
+      state.user.stats.trees += payload.trees;
+      state.user.stats.energy += payload.energy;
+      state.user.stats.waste += payload.wastes;
+    }
   },
   getters: {
     getToken({ token }) {

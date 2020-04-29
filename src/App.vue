@@ -39,6 +39,10 @@ export default {
         const route = this.$store.getters.getModuleRoute;
         this.$router.push(route);
       }
+
+      if (result && !this.$store.state.user) {
+        await this.$store.dispatch("fetchUser");
+      }
     },
   },
 };
