@@ -11,7 +11,8 @@ export default {
   name: "App",
   data() {
     return {
-      slideName: "slide-left"
+      slideName: "slide-left",
+      tokenIntervalId: 0,
     };
   },
   watch: {
@@ -19,8 +20,37 @@ export default {
       const toDepth = to.path.split("/").length;
       const fromDepth = from.path.split("/").length;
       this.slideName = toDepth < fromDepth ? "slide-right" : "slide-left";
-    }
-  }
+    },
+  },
+  async created() {
+    console.clear();
+    this.tokenIntervalId = setInterval(async () => {
+      await this.checkToken();
+    }, 3000);
+  },
+  beforeDestroy() {
+    clearInterval(this.tokenIntervalId);
+  },
+  methods: {
+    async checkToken() {
+      const result = await this.$store.dispatch("checkLocalToken");
+      console.group("Token Check");
+      console.log("Result: " + result);
+      console.log("Need token? " + this.$route.meta.needToken);
+      console.log("Push to Action? " + this.$route.meta.toAction);
+      console.groupEnd();
+
+      // need token but it's invalid
+      if (this.$route.meta.needToken && !result) return this.$router.push("/welcome");
+
+      // push user to action with valid token
+      if (this.$route.meta.toAction && result) {
+        await this.$store.dispatch("fetchUser");
+        const route = this.$store.getters.getModuleRoute;
+        this.$router.push(route);
+      }
+    },
+  },
 };
 </script>
 
@@ -77,6 +107,5 @@ html {
 }
 
 @media screen and (max-width: 1280px) {
-  
 }
 </style>
