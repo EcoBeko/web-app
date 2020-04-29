@@ -1,29 +1,32 @@
 <template>
   <article class="news-item">
-    <img :src="loadImage(post.owner.avatar)" alt="author-image" class="author-image" />
+    <div class="back-button" @click="close">
+      <div>Back</div>
+    </div>
+    <img :src="loadImage(article.owner.avatar)" alt="author-image" class="author-image" />
     <div class="content">
       <header class="heading">
         <div class="author-wrapper">
           <span class="author">{{ fullName }}</span>
-          <span>shared</span>
         </div>
         <div class="status-wrapper">
           <span class="time">{{ fixedTime }}</span>
         </div>
       </header>
-      <div class="post-image">
-        <img :src="loadImage(post.image)" alt="post-image" />
+      <div class="content-wrapper">
+        <h3 class="post-title">
+          {{ article.title }}
+        </h3>
+        <div class="post-image">
+          <img :src="loadImage(article.image)" alt="post-image" />
+        </div>
+        <div class="post-text">
+          {{ article.article }}
+        </div>
       </div>
-      <h3 class="post-title">
-        {{ post.title }}
-      </h3>
-      <p class="post-text">
-        {{ fixedText }}
-        <button class="more" @click="openNews">Show more</button>
-      </p>
       <div class="post-items-wrapper">
         <icon-text image="like.svg" size="16px">
-          {{ post.likes }}
+          {{ article.likes }}
         </icon-text>
       </div>
     </div>
@@ -32,9 +35,9 @@
 
 <script>
 export default {
-  name: "NewsItem",
+  name: "NewsArticle",
   props: {
-    post: Object,
+    article: Object,
   },
   data() {
     return {
@@ -42,38 +45,27 @@ export default {
     };
   },
   methods: {
-    openNews() {
-      this.$emit("select-article", this.post.id);
-    },
-    getImage(image) {
-      const images = require.context("@/assets/", false, /[\.png\.gif]$/);
-      return images("./" + image);
-    },
     loadImage(image) {
       return `http://localhost:3000/${image}`;
     },
     like() {
       if (!this.liked) {
-        this.post.likes++;
+        this.article.likes++;
         this.liked = true;
       }
+    },
+    close() {
+      this.$store.state.news.reading = false;
     },
   },
   computed: {
     fixedTime() {
-      const date = new Date(Date.parse(this.post.time));
+      const date = new Date(Date.parse(this.article.time));
       return date.toLocaleString();
     },
-    fixedText() {
-      if (this.post.article.length > 200) return this.post.article.substr(0, 200) + "...";
-      return this.post.article;
-    },
     fullName() {
-      return this.post.owner.surname + " " + this.post.owner.name;
+      return this.article.owner.surname + " " + this.article.owner.name;
     },
-    reading() {
-      return this.$store.state.news.reading;
-    }
   },
 };
 </script>
@@ -82,20 +74,59 @@ export default {
 @import "../../../scss/_globals.scss";
 @import "../../../scss/_base.scss";
 
+.back-button {
+  position: fixed;
+  left: 0px;
+  top: 140px;
+  background-color: rgba($color: #000000, $alpha: 0.02);
+  width: 100px;
+  text-align: center;
+  height: 100%;
+  transition: 0.3s;
+
+  div {
+    font-size: 1.5rem;
+    margin-top: 4em;
+  }
+
+  &:hover {
+    background-color: rgba($color: #000000, $alpha: 0.05);
+  }
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  @include pos(1, 2 3, 3);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .row {
   display: flex;
   flex-direction: row;
   align-items: center;
+  opacity: 0;
+  animation: fade-in 1s 0s ease-in-out forwards;
 }
 
 .news-item {
   @extend .row;
   align-items: flex-start;
   position: relative;
+  padding: 1em;
 
   .author-image {
     width: 60px;
     margin-right: 1em;
+    padding: 0.5em;
   }
 
   .content {
@@ -131,9 +162,6 @@ export default {
     }
 
     .post-image {
-      @include pos(1, 2, 1, 4);
-      margin: 0.5em 1em;
-
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -146,15 +174,14 @@ export default {
     }
 
     .post-title {
-      @include pos(2, 2);
-      font-size: 1.2rem;
-      margin: 0.5em 1em;
+      font-size: 2rem;
+      margin: 0.5em;
+      margin-bottom: 1em;
     }
 
     .post-text {
-      @include pos(2, 3);
-      font-size: 1rem;
-      margin: 0em 1em;
+      font-size: 1.5rem;
+      margin: 2em 1em 1em 1em;
 
       .more {
         margin: 1em 0em;

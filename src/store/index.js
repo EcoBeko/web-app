@@ -11,6 +11,7 @@ export default new Vuex.Store({
     news: {
       search: "",
       posts: [],
+      reading: false
     },
   },
   mutations: {
